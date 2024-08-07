@@ -1,13 +1,18 @@
 package com.example.capstone1.Service;
 
 import com.example.capstone1.Model.Merchant;
+import com.example.capstone1.Model.MerchantStock;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
 @Service
+@RequiredArgsConstructor
 public class MerchantService {
     ArrayList<Merchant> merchants = new ArrayList<>();
+    private final MerchantStockService merchantStockService;
+
 
     public void addMerchant(Merchant merchant) {
         merchants.add(merchant);
@@ -44,5 +49,14 @@ public class MerchantService {
             }
         }
         return false;
+    }
+
+    public boolean restock(int productId, int merchantId, int amount) {
+        MerchantStock temp = merchantStockService.getMerchantStock(productId, merchantId);
+        if (temp == null) {
+            return false;
+        }
+        temp.setStock(temp.getStock() + amount);
+        return true;
     }
 }
