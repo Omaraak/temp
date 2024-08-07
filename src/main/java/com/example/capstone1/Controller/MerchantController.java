@@ -48,4 +48,11 @@ public class MerchantController {
             return ResponseEntity.status(200).body(new ApiResponse("Merchant deleted successfully"));
         return ResponseEntity.status(404).body(new ApiResponse("No merchant found"));
     }
+
+    @PutMapping("/restockProduct/{productId}/{merchantId}/{amount}")
+    public ResponseEntity<ApiResponse> restockProduct(@PathVariable int productId, @PathVariable int merchantId, @PathVariable int amount){
+        if (merchantService.restockProduct(productId, merchantId, amount))
+            return ResponseEntity.status(200).body(new ApiResponse("Product restocked successfully"));
+        return ResponseEntity.status(404).body(new ApiResponse("No merchant found"));
+    }
 }
