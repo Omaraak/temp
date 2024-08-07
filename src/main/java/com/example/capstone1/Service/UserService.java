@@ -7,16 +7,13 @@ import com.example.capstone1.Model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     ArrayList<User> users = new ArrayList<>();
-    //contains the product in the cart
-    ArrayList<Product> cartP = new ArrayList<>();
-    //Contain the merchant in the cart
-    ArrayList<Merchant> cartM = new ArrayList<>();
 
     private final ProductService productService;
     private final MerchantService merchantService;
@@ -67,6 +64,7 @@ public class UserService {
                                         }
                                         merchantStock.setStock(merchantStock.getStock() - 1);
                                         user.setBalance(user.getBalance() - product.getPrice());
+                                        product.setBoughtDate(LocalDate.now());
                                         user.getPurchasedProducts().add(product);
                                         return "Successfully bought product";
                                     }
@@ -87,8 +85,8 @@ public class UserService {
             if (user.getId() == userId) {
                 for (int i = 0; i < quantity; i++) {
                     if (productService.getProduct(productId) != null && merchantService.getMerchant(merchantId) != null){
-                        cartP.add(productService.getProduct(productId));
-                        cartM.add(merchantService.getMerchant(merchantId));
+                        user.getCartP().add(productService.getProduct(productId));
+                        user.getCartM().add(merchantService.getMerchant(merchantId));
                     }
                 }
                 return true;
@@ -100,22 +98,48 @@ public class UserService {
     public String checkout(int userId) {
         for (User user : users) {
             if (user.getId() == userId) {
-                if (cartP.isEmpty()) {
+                if (user.getCartP().isEmpty()) {
                     return "Cart is empty";
                 }
                 double totalPrice = 0;
-                for (Product product : cartP) {
+                for (Product product : user.getCartP()) {
                     totalPrice += product.getPrice();
                 }
                 if (totalPrice > user.getBalance()) {
                     return "total price exceeded user balance";
                 }
-                for (int i = 0; i < cartP.size(); i++) {
-                    buy(userId, cartP.get(i).getId(), cartM.get(i).getId());
+                for (int i = 0; i < user.getCartP().size(); i++) {
+                    buy(userId, user.getCartP().get(i).getId(), user.getCartM().get(i).getId());
                 }
-                cartP.clear();
-                cartM.clear();
+                user.getCartP().clear();
+                user.getCartM().clear();
                 return "Successfully bought all items in cart";
+            }
+        }
+        return "User not found";
+    }
+
+    public ArrayList<Product> history(int userId){
+        for (User user : users) {
+            if (user.getId() == userId) {
+                return user.getPurchasedProducts();
+            }
+        }
+        return null;
+    }
+
+    public String returnProduct(int userId, int productId, int merchantId) {
+        MerchantStock temp = merchantStockService.getMerchantStock(productId, merchantId);
+        for (User user : users) {
+            if (user.getId() == userId) {
+                for (Product product : user.getPurchasedProducts()) {
+                    if (product.getId() == productId) {
+                        user.setBalance(user.getBalance() + product.getPrice());
+                        temp.setStock(temp.getStock() + 1);
+                        return "Successfully returned product";
+                    }
+                }
+                return "You haven't purchased the product yet";
             }
         }
         return "User not found";
