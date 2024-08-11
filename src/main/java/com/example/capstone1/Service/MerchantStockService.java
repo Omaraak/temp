@@ -35,6 +35,15 @@ public class MerchantStockService {
         return merchantStocks;
     }
 
+    public MerchantStock getMerchantStock(int productId, int merchantId) {
+        for (MerchantStock merchantStock : merchantStocks) {
+            if (merchantStock.getProductID() == productId && merchantStock.getMerchantID() == merchantId) {
+                return merchantStock;
+            }
+        }
+        return null;
+    }
+
     public boolean updateMerchantStock(MerchantStock merchantStock, int id) {
         for (int i = 0; i < merchantStocks.size(); i++) {
             if (merchantStocks.get(i).getId() == id) {
@@ -53,5 +62,14 @@ public class MerchantStockService {
             }
         }
         return false;
+    }
+
+    public boolean restockProduct(int productId, int merchantId, int amount) {
+        MerchantStock merchantStock = getMerchantStock(productId, merchantId);
+        if (merchantStock == null) {
+            return false;
+        }
+        merchantStock.setStock(merchantStock.getStock() + amount);
+        return true;
     }
 }
