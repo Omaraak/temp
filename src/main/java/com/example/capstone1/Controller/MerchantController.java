@@ -3,6 +3,7 @@ package com.example.capstone1.Controller;
 import com.example.capstone1.Api.ApiResponse;
 import com.example.capstone1.Model.Merchant;
 import com.example.capstone1.Service.MerchantService;
+import com.example.capstone1.Service.MerchantStockService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MerchantController {
     private final MerchantService merchantService;
+    private final MerchantStockService merchantStockService;
 
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> addMerchant(@Valid @RequestBody Merchant merchant, Errors errors){
@@ -51,7 +53,7 @@ public class MerchantController {
 
     @PutMapping("/restockProduct/{productId}/{merchantId}/{amount}")
     public ResponseEntity<ApiResponse> restockProduct(@PathVariable int productId, @PathVariable int merchantId, @PathVariable int amount){
-        if (merchantService.restockProduct(productId, merchantId, amount))
+        if (merchantStockService.restockProduct(productId, merchantId, amount))
             return ResponseEntity.status(200).body(new ApiResponse("Product restocked successfully"));
         return ResponseEntity.status(404).body(new ApiResponse("No merchant found"));
     }
