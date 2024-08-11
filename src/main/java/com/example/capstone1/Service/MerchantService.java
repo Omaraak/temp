@@ -50,13 +50,4 @@ public class MerchantService {
         }
         return false;
     }
-
-    public boolean restock(int productId, int merchantId, int amount) {
-        MerchantStock temp = merchantStockService.getMerchantStock(productId, merchantId);
-        if (temp == null) {
-            return false;
-        }
-        temp.setStock(temp.getStock() + amount);
-        return true;
-    }
 }
