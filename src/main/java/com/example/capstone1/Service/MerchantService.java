@@ -11,7 +11,6 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class MerchantService {
     ArrayList<Merchant> merchants = new ArrayList<>();
-    private final MerchantStockService merchantStockService;
 
 
     public void addMerchant(Merchant merchant) {
